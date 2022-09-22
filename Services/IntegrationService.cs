@@ -64,19 +64,16 @@ namespace BookingSystemAPI.Services
 
         public async Task<SearchRes> Search(SearchReq searchReq)
         {
+            var hotelService = _integrationServiceFactory.GetIntegrationService(IntegrationServiceType.Hotel);
+            var response = await hotelService.Search(searchReq);
+
             var flights = await _flightsHttpClient.GetFromJsonAsync<IEnumerable<FlightDto>>(
                 $"?departureAirport={searchReq.DepartureAirport}&arrivalAirport={searchReq.Destination}");
-
-            var response = new SearchRes();
 
             foreach (var flight in flights!)
             {
                 response.Options.Add(_mapper.Map<Option>(flight));
             }
-
-            var hotelService = _integrationServiceFactory.GetIntegrationService(IntegrationServiceType.Hotel);
-            var hotels = await hotelService.Search(searchReq);
-            response.Options.AddRange(hotels.Options);
 
             return response;
         }
