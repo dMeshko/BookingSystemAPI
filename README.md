@@ -34,14 +34,6 @@ curl -X 'GET' \
   -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0YmRhMmVhNS00MWVhLTQyMjctYThjNi03MWRkNmJkZmQwOTYiLCJuYmYiOjE2NjM4NDMwMDQsImV4cCI6MTY2Mzg3OTAwNCwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NzIyNiIsImF1ZCI6ImJvb2tpbmdfc3lzdGVtLmFwaSJ9.UZJ5urKkzj1BwEDiph_QlkoblyEyn1pPN3jO51LMSLI'
 ```
 
-##### Search last minute hotels (hotels for the next 45 days)
-```
-curl -X 'GET' \
-  'https://localhost:7226/api/search?Destination=SKP&DepartureAirport=OSL&FromDate=2022-09-22T17%3A32%3A28Z&ToDate=2022-09-27T17%3A32%3A28Z' \
-  -H 'accept: application/json' \
-  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0YmRhMmVhNS00MWVhLTQyMjctYThjNi03MWRkNmJkZmQwOTYiLCJuYmYiOjE2NjM4NDMwMDQsImV4cCI6MTY2Mzg3OTAwNCwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NzIyNiIsImF1ZCI6ImJvb2tpbmdfc3lzdGVtLmFwaSJ9.UZJ5urKkzj1BwEDiph_QlkoblyEyn1pPN3jO51LMSLI'
-```
-
 ### Booking
 ##### Book the last minute hotel
 ```
