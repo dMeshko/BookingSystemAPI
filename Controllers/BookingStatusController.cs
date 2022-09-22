@@ -1,5 +1,6 @@
 ﻿using BookingSystemAPI.Services;
 using BookingSystemAPI.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookingSystemAPI.Controllers

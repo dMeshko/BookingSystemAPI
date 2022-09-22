@@ -1,5 +1,6 @@
 ﻿using BookingSystemAPI.Services;
 using BookingSystemAPI.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookingSystemAPI.Controllers
@@ -7,6 +8,7 @@ namespace BookingSystemAPI.Controllers
     [Route("api/book")]
     [ApiController]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public class BookingController : ControllerBase
     {
         private readonly IManagerService _managerService;

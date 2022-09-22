@@ -8,6 +8,11 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using System.Reflection;
 using BookingSystemAPI.Helpers;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.OpenApi.Models;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,10 +24,58 @@ builder.Services.AddControllers(x =>
     x.OutputFormatters.RemoveType<StringOutputFormatter>();
 });
 
-builder.Services.AddControllers();
+var executingAssembly = Assembly.GetExecutingAssembly().GetName().Name;
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(x =>
+{
+    x.AddSecurityDefinition(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = JwtBearerDefaults.AuthenticationScheme,
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "JWT Authorization header using the Bearer scheme"
+    });
+
+    x.AddSecurityRequirement(new()
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Id = JwtBearerDefaults.AuthenticationScheme,
+                    Type = ReferenceType.SecurityScheme
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+
+    var xmlCommentsFile = $"{executingAssembly}.xml";
+    x.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlCommentsFile));
+});
+
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(x =>
+    {
+        x.TokenValidationParameters = new()
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Authentication:Issuer"],
+            ValidAudience = builder.Configuration["Authentication:Audience"],
+            IssuerSigningKey =
+                new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["Authentication:Secret"]))
+        };
+    });
+
+builder.Services.AddAuthorization();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
@@ -32,12 +85,12 @@ builder.Services.AddFluentValidationRulesToSwagger();
 
 builder.Services.AddHttpClient("HotelsEndpoint", x =>
 {
-    x.BaseAddress = new Uri("https://tripx-test-functions.azurewebsites.net/api/SearchHotels");
+    x.BaseAddress = new Uri(builder.Configuration["IntegrationEndpoints:HotelsUri"]);
 });
 
 builder.Services.AddHttpClient("FlightsEndpoint", x =>
 {
-    x.BaseAddress = new Uri("https://tripx-test-functions.azurewebsites.net/api/SearchFlights");
+    x.BaseAddress = new Uri(builder.Configuration["IntegrationEndpoints:FlightsUri"]);
 });
 
 builder.Services.AddSingleton<IBookingRepository, BookingRepository>();
@@ -89,8 +142,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthorization(); 
+app.UseAuthentication();
+app.UseAuthorization();
 
-app.MapControllers();
+app.MapControllers()
+    .RequireAuthorization();
 
 app.Run();
