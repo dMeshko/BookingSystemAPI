@@ -1,3 +1,4 @@
+using System.Net;
 using BookingSystemAPI.Repositories;
 using BookingSystemAPI.Services;
 using FluentValidation;
@@ -5,6 +6,8 @@ using FluentValidation.AspNetCore;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using System.Reflection;
+using BookingSystemAPI.Helpers;
+using Microsoft.AspNetCore.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,37 +48,37 @@ builder.Services.AddTransient<IManagerService, ManagerService>();
 
 var app = builder.Build();
 
-//if (app.Environment.IsProduction())
-//{
-//    app.UseExceptionHandler(x =>
-//    {
-//        x.Run(async context =>
-//        {
-//            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-//            context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+if (app.Environment.IsProduction())
+{
+    app.UseExceptionHandler(x =>
+    {
+        x.Run(async context =>
+        {
+            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
 
-//            var exceptionHandlerFeature = context.Features.Get<IExceptionHandlerFeature>();
-//            if (exceptionHandlerFeature != null)
-//            {
-//                if (exceptionHandlerFeature.Error is not AppException applicationException)
-//                {
-//                    const string serverErrorMessage = "An unexpected error occurred.  Please try again later.";
-//                    context.Response.AddApplicationError(serverErrorMessage);
+            var exceptionHandlerFeature = context.Features.Get<IExceptionHandlerFeature>();
+            if (exceptionHandlerFeature != null)
+            {
+                if (exceptionHandlerFeature.Error is not AppException applicationException)
+                {
+                    const string serverErrorMessage = "An unexpected error occurred.  Please try again later.";
+                    context.Response.AddApplicationError(serverErrorMessage);
 
-//                    // log the error
-//                    app.Logger.LogError(context.Response.StatusCode, exceptionHandlerFeature.Error,
-//                        exceptionHandlerFeature.Error.Message);
+                    // log the error
+                    app.Logger.LogError(context.Response.StatusCode, exceptionHandlerFeature.Error,
+                        exceptionHandlerFeature.Error.Message);
 
-//                    await context.Response.WriteAsync(serverErrorMessage);
-//                    return;
-//                }
+                    await context.Response.WriteAsync(serverErrorMessage);
+                    return;
+                }
 
-//                context.Response.AddApplicationError(exceptionHandlerFeature.Error.Message, applicationException.IsJson);
-//                await context.Response.WriteAsync(exceptionHandlerFeature.Error.Message);
-//            }
-//        });
-//    });
-//}
+                context.Response.AddApplicationError(exceptionHandlerFeature.Error.Message, applicationException.IsJson);
+                await context.Response.WriteAsync(exceptionHandlerFeature.Error.Message);
+            }
+        });
+    });
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

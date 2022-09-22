@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BookingSystemAPI.Helpers;
 using BookingSystemAPI.Models;
 using BookingSystemAPI.Repositories;
 using BookingSystemAPI.ViewModels;
@@ -86,7 +87,7 @@ namespace BookingSystemAPI.Services
 
             if (desiredOption == null)
             {
-                throw new Exception("That option is no longer available for booking!");
+                throw new AppException("That option is no longer available for booking!");
             }
 
             var bookingType = _searchStrategy.GetType() == typeof(LastMinuteHotelsSearch) 

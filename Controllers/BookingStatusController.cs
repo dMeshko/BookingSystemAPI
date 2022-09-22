@@ -7,6 +7,7 @@ namespace BookingSystemAPI.Controllers
     [Route("api/status")]
     [ApiController]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public class BookingStatusController : ControllerBase
     {
         private readonly IManagerService _managerService;

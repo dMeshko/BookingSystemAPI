@@ -7,6 +7,7 @@ namespace BookingSystemAPI.Controllers
     [Route("api/search")]
     [ApiController]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public class SearchController : ControllerBase
     {
         private readonly IManagerService _managerService;
